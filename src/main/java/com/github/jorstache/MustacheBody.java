@@ -1,4 +1,4 @@
-package com.googlecode.jorstache;
+package com.github.jorstache;
 
 import jornado.Body;
 import jornado.MediaType;

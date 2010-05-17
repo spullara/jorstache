@@ -1,13 +1,13 @@
-package com.googlecode.jorstache;
+package com.github.jorstache;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.sampullara.mustache.MustacheCompiler;
+import com.google.inject.Singleton;
 import com.sampullara.mustache.MustacheException;
 import jornado.Config;
+import jornado.ErrorResponse;
 import jornado.FixedRoute;
-import jornado.Handler;
 import jornado.JettyService;
 import jornado.JornadoModule;
 import jornado.Method;
@@ -30,7 +30,7 @@ import java.io.File;
  */
 public class JorstacheServer {
   private final Module module;
-  private static MustacheCompiler mc = new MustacheCompiler(new File("src/main/webapp"));
+  public static Injector injector;
 
   /**
    * Our jornado guice module
@@ -43,6 +43,7 @@ public class JorstacheServer {
     protected Iterable<RouteHandler<Request>> createRoutes() {
       return Lists.newArrayList(
               new RouteHandler<Request>(new FixedRoute(Method.GET, "/"), HomeHandler.class),
+              new RouteHandler<Request>(new FixedRoute(Method.GET, "/fred"), FredHandler.class),
               new RouteHandler<Request>(new RegexRoute(Method.GET, "/person/([A-Za-z0-9]+)", "name"), PersonHandler.class));
     }
 
@@ -64,7 +65,7 @@ public class JorstacheServer {
   public static void main(String[] args) throws Exception {
     final Config config = createConfig(args);
     JorstacheServer app = new JorstacheServer(config);
-    final Injector injector = Guice.createInjector(app.module); // initialize the object tree with Guice
+    injector = Guice.createInjector(app.module); // initialize the object tree with Guice
     injector.getInstance(JettyService.class).startAndWait(); // get the jetty service and start it
   }
 
@@ -75,24 +76,55 @@ public class JorstacheServer {
     return config;
   }
 
+  @Singleton
   static class HomeHandler extends MustacheHandler {
     public HomeHandler() throws MustacheException {
-      super(new File("src/main/webapp"), "index.html");
+      super(new File("src/test/webapp"), "index.html");
+    }
+
+    @Override
+    public Response handle(final Request request) {
+      return super.handle(new Object() {
+        String url = request.getReconstructedUrl();
+      });
     }
   }
 
-  static class PersonHandler implements Handler<Request> {
-    static MustacheHandler mh;
-    static {
-      try {
-        mh = new MustacheHandler(new File("src/main/webapp"), "person.html");
-      } catch (MustacheException e) {
-        throw new AssertionError("Could not compile: index.html");
-      }
+  @Singleton
+  static class PersonHandler extends MustacheHandler {
+    public PersonHandler() throws MustacheException {
+      super(new File("src/test/webapp"), "person.html");
     }
+
+    @Override
+    public Response handle(final Request request) {
+      return super.handle(new Object() {
+        String name = request.getPathParameter("name");
+      });
+    }
+  }
+
+  @Singleton
+  static class FredHandler extends JorstacheHandler {
+    public FredHandler() throws MustacheException {
+      super(new File("src/test/webapp"), "fred.html", "com/sampullara/fred/Fred.java", "com.sampullara.fred.Fred");
+    }
+  }
+
+  static class JorstacheHandler extends MustacheHandler {
+    public JorstacheHandler(File root, String templatePath, String codePath, String classname) throws MustacheException {
+      super(root, templatePath, codePath, classname);
+    }
+
     @Override
     public Response handle(Request request) {
-      return mh.handle(request);
+      try {
+        Object o = getCode().getConstructor(Request.class, Injector.class).newInstance(request, injector);
+        return super.handle(o);
+      } catch (Exception e) {
+        e.printStackTrace();
+        return new ErrorResponse(e.getMessage());
+      }
     }
   }
 

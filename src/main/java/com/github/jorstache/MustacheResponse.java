@@ -1,4 +1,4 @@
-package com.googlecode.jorstache;
+package com.github.jorstache;
 
 import com.sampullara.mustache.Mustache;
 import com.sampullara.mustache.MustacheException;
