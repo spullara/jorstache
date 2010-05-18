@@ -33,7 +33,7 @@ public abstract class MustacheHandler implements Handler<Request> {
   private String codePath;
   private String classname;
   private long lastcheck = System.currentTimeMillis();
-  private Class clazz;
+  protected Class clazz;
   private long codetimestamp;
 
   public MustacheHandler(File root, String path) throws MustacheException {
@@ -98,7 +98,7 @@ public abstract class MustacheHandler implements Handler<Request> {
   }
 
   public Class getCode() {
-    if (System.currentTimeMillis() - lastcheck > 10000) {
+    if (code != null && System.currentTimeMillis() - lastcheck > 10000) {
       if (code.lastModified() != codetimestamp) {
         lastcheck = codetimestamp = code.lastModified();
         try {

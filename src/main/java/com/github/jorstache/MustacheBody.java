@@ -5,7 +5,7 @@ import jornado.MediaType;
 import com.sampullara.util.FutureWriter;
 
 /**
-* TODO: Edit this
+* Hold onto the FutureWriter for the Renderer to use.
 * <p/>
 * User: sam
 * Date: May 16, 2010
@@ -19,7 +19,7 @@ public class MustacheBody implements Body {
   }
 
   @Override
-  public Class getRenderServiceClass() {
+  public Class<MustacheRenderer> getRenderServiceClass() {
     return MustacheRenderer.class;
   }
 

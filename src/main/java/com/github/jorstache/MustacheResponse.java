@@ -23,7 +23,7 @@ public class MustacheResponse implements Response {
   private FutureWriter fw;
 
   public MustacheResponse(Mustache mustache, Scope scope) throws MustacheException {
-    fw = new FutureWriter(null /* can only be iterated */);
+    fw = new FutureWriter();
     mustache.execute(fw, scope);
   }
 

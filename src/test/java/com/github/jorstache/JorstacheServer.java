@@ -6,7 +6,6 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.sampullara.mustache.MustacheException;
 import jornado.Config;
-import jornado.ErrorResponse;
 import jornado.FixedRoute;
 import jornado.JettyService;
 import jornado.JornadoModule;
@@ -44,6 +43,7 @@ public class JorstacheServer {
       return Lists.newArrayList(
               new RouteHandler<Request>(new FixedRoute(Method.GET, "/"), HomeHandler.class),
               new RouteHandler<Request>(new FixedRoute(Method.GET, "/fred"), FredHandler.class),
+              new RouteHandler<Request>(new FixedRoute(Method.GET, "/fred2"), CodebehindFredHandler.class),
               new RouteHandler<Request>(new RegexRoute(Method.GET, "/person/([A-Za-z0-9]+)", "name"), PersonHandler.class));
     }
 
@@ -105,26 +105,16 @@ public class JorstacheServer {
   }
 
   @Singleton
-  static class FredHandler extends JorstacheHandler {
+  static class FredHandler extends CodebehindHandler {
     public FredHandler() throws MustacheException {
       super(new File("src/test/webapp"), "fred.html", "com/sampullara/fred/Fred.java", "com.sampullara.fred.Fred");
     }
   }
 
-  static class JorstacheHandler extends MustacheHandler {
-    public JorstacheHandler(File root, String templatePath, String codePath, String classname) throws MustacheException {
-      super(root, templatePath, codePath, classname);
-    }
-
-    @Override
-    public Response handle(Request request) {
-      try {
-        Object o = getCode().getConstructor(Request.class, Injector.class).newInstance(request, injector);
-        return super.handle(o);
-      } catch (Exception e) {
-        e.printStackTrace();
-        return new ErrorResponse(e.getMessage());
-      }
+  @Singleton
+  static class CodebehindFredHandler extends CodebehindHandler {
+    public CodebehindFredHandler() throws MustacheException {
+      super(new File("src/test/webapp"), "fred.html", CodeBehindFred.class);
     }
   }
 
