@@ -3,6 +3,7 @@ package com.sampullara.fred;
 import jornado.Request;
 import jornado.UserService;
 import com.github.jorstache.JorstacheServer;
+import com.google.inject.Inject;
 
 /**
  * Fred scope
@@ -12,8 +13,9 @@ import com.github.jorstache.JorstacheServer;
  * Time: 2:54:05 PM
  */
 public class Fred {
-  Request request;
+  final Request request;
 
+  @Inject
   public Fred(Request request) {
     this.request = request;
   }
@@ -22,7 +24,7 @@ public class Fred {
   String last_name = "Flintstone";
 
   String webid() {
-    return JorstacheServer.injector.getInstance(UserService.class).load(null).getWebId();
+    return JorstacheServer.injector.getInstance(UserService.class).load("fred").getWebId();
   }
 
   String url() {

@@ -24,6 +24,7 @@ import java.io.PrintWriter;
  * Time: 5:01:24 PM
  */
 public abstract class MustacheHandler implements Handler<Request> {
+
   private MustacheCompiler mc;
   private Mustache mustache;
   private long timestamp;

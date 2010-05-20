@@ -12,10 +12,10 @@ import jornado.JornadoModule;
 import jornado.Method;
 import jornado.RegexRoute;
 import jornado.Request;
+import jornado.RequestFactory;
 import jornado.Response;
 import jornado.RouteHandler;
 import jornado.UserService;
-import jornado.WebUser;
 import org.joptparse.OptionParser;
 
 import java.io.File;
@@ -36,25 +36,18 @@ public class JorstacheServer {
    */
   static class Module extends JornadoModule {
     protected Module(final Config config) {
-      super(config);
-    }
-
-    protected Iterable<RouteHandler<Request>> createRoutes() {
-      return Lists.newArrayList(
+      super(config, Lists.newArrayList(
               new RouteHandler<Request>(new FixedRoute(Method.GET, "/"), HomeHandler.class),
               new RouteHandler<Request>(new FixedRoute(Method.GET, "/fred"), FredHandler.class),
               new RouteHandler<Request>(new FixedRoute(Method.GET, "/fred2"), CodebehindFredHandler.class),
-              new RouteHandler<Request>(new RegexRoute(Method.GET, "/person/([A-Za-z0-9]+)", "name"), PersonHandler.class));
+              new RouteHandler<Request>(new RegexRoute(Method.GET, "/person/([A-Za-z0-9]+)", "name"), PersonHandler.class)));
     }
 
     @Override
     protected void configure() {
       super.configure();
-      bind(UserService.class).to(TinyUserService.class);
-
-      // TODO: tried to bind using bounded wildcard generics, but no go. seems impossible with guice. blergh.
-      //bind(new TypeLiteral<UserService<? extends WebUser>>(){}).to(TinyUserService.class);
-      //bind(TypeLiteral.get(Types.newParameterizedType(UserService.class, Types.subtypeOf(WebUser.class)))).to(TinyUserService.class);
+      bind(UserService.class).to(JorstacheUserService.class);
+      bind(RequestFactory.class).to(JorstacheRequestFactory.class);
     }
   }
 
@@ -118,15 +111,10 @@ public class JorstacheServer {
     }
   }
 
-  static class TinyUserService implements UserService<TinyWebUser> {
-    public TinyWebUser load(String id) {
-      return new TinyWebUser();
+  static class JorstacheUserService implements UserService<JorstacheUser> {
+    public JorstacheUser load(String id) {
+      return new JorstacheUser(id);
     }
   }
 
-  static class TinyWebUser implements WebUser {
-    public String getWebId() {
-      return "123";
-    }
-  }
 }

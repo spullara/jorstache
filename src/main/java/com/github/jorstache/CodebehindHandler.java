@@ -1,5 +1,7 @@
 package com.github.jorstache;
 
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.sampullara.mustache.MustacheException;
 import jornado.ErrorResponse;
 import jornado.Request;
@@ -15,6 +17,9 @@ import java.io.File;
 * Time: 4:55:24 PM
 */
 public class CodebehindHandler extends MustacheHandler {
+  @Inject
+  private Injector injector;
+
   public CodebehindHandler(File root, String templatePath, String codePath, String classname) throws MustacheException {
     super(root, templatePath, codePath, classname);
   }
