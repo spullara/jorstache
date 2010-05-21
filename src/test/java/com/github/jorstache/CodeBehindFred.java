@@ -1,19 +1,18 @@
 package com.github.jorstache;
 
+import com.google.inject.Inject;
 import jornado.Request;
 import jornado.UserService;
 
 public class CodeBehindFred {
+  @Inject
   Request request;
-
-  public CodeBehindFred(Request request) {
-    this.request = request;
-  }
+  @Inject UserService userService;
 
   String first_name = "Fred";
   String last_name = "Flintstone";
   String webid() {
-    return JorstacheServer.injector.getInstance(UserService.class).load(null).getWebId();
+    return userService.load("test").getWebId();
   }
   String url() { return request.getReconstructedUrl(); }
 }
