@@ -72,7 +72,7 @@ public class JorstacheServer {
   @Singleton
   static class HomeHandler extends MustacheHandler {
     public HomeHandler() throws MustacheException {
-      super(new File("src/test/webapp"), "index.html");
+      super(new File("webapp/src"), "index.html");
     }
 
     @Override
@@ -86,7 +86,7 @@ public class JorstacheServer {
   @Singleton
   static class PersonHandler extends MustacheHandler {
     public PersonHandler() throws MustacheException {
-      super(new File("src/test/webapp"), "person.html");
+      super(new File("webapp/src"), "person.html");
     }
 
     @Override
@@ -100,14 +100,14 @@ public class JorstacheServer {
   @Singleton
   static class FredHandler extends CodebehindHandler {
     public FredHandler() throws MustacheException {
-      super(new File("src/test/webapp"), "fred.html", "com/sampullara/fred/Fred.java", "com.sampullara.fred.Fred");
+      super(new File("webapp/src"), "fred.html", "com/sampullara/fred/Fred.java", "com.sampullara.fred.Fred");
     }
   }
 
   @Singleton
   static class CodebehindFredHandler extends CodebehindHandler {
     public CodebehindFredHandler() throws MustacheException {
-      super(new File("src/test/webapp"), "fred.html", CodeBehindFred.class);
+      super(new File("webapp/src"), "fred.html", CodeBehindFred.class);
     }
   }
 

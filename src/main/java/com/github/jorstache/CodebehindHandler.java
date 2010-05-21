@@ -1,7 +1,9 @@
 package com.github.jorstache;
 
+import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.sampullara.mustache.MustacheException;
 import jornado.ErrorResponse;
 import jornado.Request;
@@ -30,9 +32,15 @@ public class CodebehindHandler extends MustacheHandler {
   }
 
   @Override
-  public Response handle(Request request) {
+  public Response handle(final Request request) {
     try {
-      Object o = getCode().getConstructor(Request.class).newInstance(request);
+      Injector childInjector = injector.createChildInjector(new Module() {
+        @Override
+        public void configure(Binder binder) {
+          binder.bind(Request.class).toInstance(request);
+        }
+      });
+      Object o = childInjector.getInstance(getCode());
       return super.handle(o);
     } catch (Exception e) {
       e.printStackTrace();
