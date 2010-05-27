@@ -30,7 +30,7 @@ public class CodebehindHandler extends MustacheHandler {
     super(root, templatePath, codePath, classname);
   }
 
-  public CodebehindHandler(File root, String templatePath, Class clazz) throws MustacheException {
+  public CodebehindHandler(File root, String templatePath, Class<?> clazz) throws MustacheException {
     super(root, templatePath);
     this.clazz = clazz;
   }

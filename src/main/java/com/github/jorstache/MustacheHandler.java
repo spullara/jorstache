@@ -98,7 +98,7 @@ public abstract class MustacheHandler implements Handler<Request> {
     }
   }
 
-  public Class getCode() {
+  public Class<?> getCode() {
     if (code != null && System.currentTimeMillis() - lastcheck > 10000) {
       if (code.lastModified() != codetimestamp) {
         lastcheck = codetimestamp = code.lastModified();
