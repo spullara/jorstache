@@ -22,6 +22,10 @@ public class CodebehindHandler extends MustacheHandler {
   @Inject
   private Injector injector;
 
+  public CodebehindHandler(File root, String templatePath, String classname) throws MustacheException {
+    this(root, templatePath, classname.replace(".", "/") + ".java", classname);
+  }
+
   public CodebehindHandler(File root, String templatePath, String codePath, String classname) throws MustacheException {
     super(root, templatePath, codePath, classname);
   }
