@@ -54,6 +54,7 @@ public abstract class MustacheHandler implements Handler<Request> {
     timestamp = template.lastModified();
     codetimestamp = code.lastModified();
     mc = new MustacheCompiler(root);
+    mc.setSuperclass("com.github.jorstache.Jorstache");
     mustache = mc.parseFile(this.path);
     try {
       clazz = RuntimeJavaCompiler.compile(new PrintWriter(System.out, true), classname, getText(codePath, new BufferedReader(new FileReader(code)))).loadClass(classname);
