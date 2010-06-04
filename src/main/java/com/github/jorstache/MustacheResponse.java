@@ -10,6 +10,7 @@ import jornado.Response;
 import jornado.Status;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Create a mustache response.
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 public class MustacheResponse implements Response {
   public static final Iterable<HeaderOp> EMPTY_ITERABLE = new ArrayList<HeaderOp>(0);
   private FutureWriter fw;
+  private List<HeaderOp> headerList = new ArrayList<HeaderOp>();
 
   public MustacheResponse(Mustache mustache, Scope scope) throws MustacheException {
     fw = new FutureWriter();
@@ -29,7 +31,7 @@ public class MustacheResponse implements Response {
 
   @Override
   public Iterable<HeaderOp> getHeaderOps() {
-    return EMPTY_ITERABLE;
+    return headerList;
   }
 
   @Override
@@ -40,6 +42,11 @@ public class MustacheResponse implements Response {
   @Override
   public Body getBody() {
     return new MustacheBody(fw);
+  }
+
+  @Override
+  public void addHeaderOp(HeaderOp headerOp) {
+    headerList.add(headerOp);
   }
 
 }
