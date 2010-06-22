@@ -39,6 +39,7 @@ public class JorstacheServer {
       super(config, Lists.newArrayList(
               new RouteHandler<Request>(new FixedRoute(Method.GET, "/"), HomeHandler.class),
               new RouteHandler<Request>(new FixedRoute(Method.GET, "/fred"), FredHandler.class),
+              new RouteHandler<Request>(new FixedRoute(Method.GET, "/timeout"), TimeoutHandler.class),
               new RouteHandler<Request>(new FixedRoute(Method.GET, "/fred2"), CodebehindFredHandler.class),
               new RouteHandler<Request>(new RegexRoute(Method.GET, "/person/([A-Za-z0-9]+)", "name"), PersonHandler.class)));
     }
@@ -108,6 +109,13 @@ public class JorstacheServer {
   static class CodebehindFredHandler extends CodebehindHandler {
     public CodebehindFredHandler() throws MustacheException {
       super(new File("webapp/src"), "fred.html", CodeBehindFred.class);
+    }
+  }
+
+  @Singleton
+  static class TimeoutHandler extends CodebehindHandler {
+    public TimeoutHandler() throws MustacheException {
+      super(new File("webapp/src"), "timedout.html", "com.sampullara.fred.TimedOut");
     }
   }
 

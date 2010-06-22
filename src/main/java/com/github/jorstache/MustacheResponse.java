@@ -3,7 +3,6 @@ package com.github.jorstache;
 import com.sampullara.mustache.Mustache;
 import com.sampullara.mustache.MustacheException;
 import com.sampullara.mustache.Scope;
-import com.sampullara.util.FutureWriter;
 import jornado.Body;
 import jornado.HeaderOp;
 import jornado.Response;
@@ -21,12 +20,12 @@ import java.util.List;
  */
 public class MustacheResponse implements Response {
   public static final Iterable<HeaderOp> EMPTY_ITERABLE = new ArrayList<HeaderOp>(0);
-  private FutureWriter fw;
   private List<HeaderOp> headerList = new ArrayList<HeaderOp>();
+  private MustacheBody mustacheBody;
 
   public MustacheResponse(Mustache mustache, Scope scope) throws MustacheException {
-    fw = new FutureWriter();
-    mustache.execute(fw, scope);
+    scope.put("jorstacheStartTime", System.currentTimeMillis());
+    mustacheBody = new MustacheBody(mustache, scope);
   }
 
   @Override
@@ -41,7 +40,7 @@ public class MustacheResponse implements Response {
 
   @Override
   public Body getBody() {
-    return new MustacheBody(fw);
+    return mustacheBody;
   }
 
   @Override

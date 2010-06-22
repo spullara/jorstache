@@ -1,8 +1,14 @@
 package com.github.jorstache;
 
+import com.sampullara.mustache.Mustache;
+import com.sampullara.mustache.MustacheException;
+import com.sampullara.mustache.Scope;
+import com.sampullara.util.FutureWriter;
 import jornado.Body;
 import jornado.MediaType;
-import com.sampullara.util.FutureWriter;
+
+import java.io.IOException;
+import java.io.Writer;
 
 /**
 * Hold onto the FutureWriter for the Renderer to use.
@@ -12,10 +18,12 @@ import com.sampullara.util.FutureWriter;
 * Time: 2:13:47 PM
 */
 public class MustacheBody implements Body {
-  private FutureWriter fw;
+  private Mustache mustache;
+  private Scope scope;
 
-  public MustacheBody(FutureWriter fw) {
-    this.fw = fw;
+  public MustacheBody(Mustache mustache, Scope scope) {
+    this.mustache = mustache;
+    this.scope = scope;
   }
 
   @Override
@@ -28,7 +36,9 @@ public class MustacheBody implements Body {
     return MediaType.TEXT_HTML_UTF8;
   }
 
-  public FutureWriter getFutureWriter() {
-    return fw;
+  public void execute(Writer writer) throws MustacheException, IOException {
+    FutureWriter fw = new FutureWriter(writer);
+    mustache.execute(fw, scope);
+    fw.flush();
   }
 }

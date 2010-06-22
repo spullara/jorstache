@@ -1,6 +1,6 @@
 package com.github.jorstache;
 
-import com.sampullara.util.FutureWriter;
+import com.sampullara.mustache.MustacheException;
 import jornado.Body;
 import jornado.RenderService;
 
@@ -18,8 +18,10 @@ public class MustacheRenderer implements RenderService {
   @Override
   public void write(Writer writer, Body body) throws IOException {
     MustacheBody mb = (MustacheBody) body;
-    FutureWriter futureWriter = mb.getFutureWriter();
-    futureWriter.setWriter(writer);
-    futureWriter.flush();
+    try {
+      mb.execute(writer);
+    } catch (MustacheException e) {
+      throw new IOException("Mustache failed", e);
+    }
   }
 }
