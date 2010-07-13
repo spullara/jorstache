@@ -9,6 +9,8 @@
   <version>0.1</version>
   <packaging>jar</packaging>
 
+  <name>jorstache</name>
+
   <dependencies>
     <!-- Mustache -->
     <dependency>
