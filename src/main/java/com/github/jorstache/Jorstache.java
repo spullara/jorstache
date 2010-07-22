@@ -27,6 +27,7 @@ import java.util.concurrent.TimeoutException;
  */
 public abstract class Jorstache extends Mustache {
 
+  // TODO: Guice up mustache.java
   private static ExecutorService es = Executors.newCachedThreadPool();
 
   static class TimestampedMustache {
