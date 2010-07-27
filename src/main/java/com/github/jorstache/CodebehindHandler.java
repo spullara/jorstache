@@ -28,6 +28,7 @@ public class CodebehindHandler extends MustacheHandler {
 
   public CodebehindHandler(File root, String templatePath, String codePath, String classname) throws MustacheException {
     super(root, templatePath, codePath, classname);
+    getCode();
   }
 
   public CodebehindHandler(File root, String templatePath, Class<?> clazz) throws MustacheException {
