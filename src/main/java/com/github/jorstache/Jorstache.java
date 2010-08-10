@@ -42,20 +42,24 @@ public abstract class Jorstache extends Mustache {
   protected void partial(final FutureWriter writer, Scope s, String name) throws MustacheException {
     String parentDir = new File(getPath()).getParent();
     String filename = (parentDir == null ? "" : parentDir + "/") + name + ".html";
-    TimestampedMustache tm = cache.get(filename);
-    if (tm == null || ((System.currentTimeMillis() - tm.lastcheck > 10000) &&
-            ((tm.lastcheck = System.currentTimeMillis()) > 0) &&
-            (new File(getRoot(), filename).lastModified() > tm.timestamp))) {
-      MustacheCompiler c = new MustacheCompiler(getRoot());
-      if (name != null) {
-        Mustache mustache = c.parseFile(filename);
-        tm = new TimestampedMustache();
-        tm.mustache = mustache;
-        tm.timestamp = new File(getRoot(), filename).lastModified();
-        tm.lastcheck = System.currentTimeMillis();
-        cache.put(filename, tm);
-      } else {
-        return;
+    TimestampedMustache tm;
+    // We were compiling too many times here when concurrent
+    synchronized (filename.intern()) {
+      tm = cache.get(filename);
+      if (tm == null || ((System.currentTimeMillis() - tm.lastcheck > 10000) &&
+              ((tm.lastcheck = System.currentTimeMillis()) > 0) &&
+              (new File(getRoot(), filename).lastModified() > tm.timestamp))) {
+        MustacheCompiler c = new MustacheCompiler(getRoot());
+        if (name != null) {
+          Mustache mustache = c.parseFile(filename);
+          tm = new TimestampedMustache();
+          tm.mustache = mustache;
+          tm.timestamp = new File(getRoot(), filename).lastModified();
+          tm.lastcheck = System.currentTimeMillis();
+          cache.put(filename, tm);
+        } else {
+          return;
+        }
       }
     }
     Object parent = s.get(name);
