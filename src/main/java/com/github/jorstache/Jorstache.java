@@ -36,13 +36,13 @@ public abstract class Jorstache extends Mustache {
     long lastcheck;
   }
 
-  private Map<String, TimestampedMustache> cache = new ConcurrentHashMap<String, TimestampedMustache>();
+  private static Map<String, TimestampedMustache> cache = new ConcurrentHashMap<String, TimestampedMustache>();
 
   @Override
   protected void partial(final FutureWriter writer, Scope s, String name) throws MustacheException {
-    TimestampedMustache tm = cache.get(name);
     String parentDir = new File(getPath()).getParent();
     String filename = (parentDir == null ? "" : parentDir + "/") + name + ".html";
+    TimestampedMustache tm = cache.get(filename);
     if (tm == null || ((System.currentTimeMillis() - tm.lastcheck > 10000) &&
             ((tm.lastcheck = System.currentTimeMillis()) > 0) &&
             (new File(getRoot(), filename).lastModified() > tm.timestamp))) {
@@ -53,7 +53,7 @@ public abstract class Jorstache extends Mustache {
         tm.mustache = mustache;
         tm.timestamp = new File(getRoot(), filename).lastModified();
         tm.lastcheck = System.currentTimeMillis();
-        cache.put(name, tm);
+        cache.put(filename, tm);
       } else {
         return;
       }
