@@ -50,6 +50,7 @@ public abstract class Jorstache extends Mustache {
               ((tm.lastcheck = System.currentTimeMillis()) > 0) &&
               (new File(getRoot(), filename).lastModified() > tm.timestamp))) {
         MustacheCompiler c = new MustacheCompiler(getRoot());
+        c.setSuperclass(Jorstache.class.getName());
         if (name != null) {
           Mustache mustache = c.parseFile(filename);
           tm = new TimestampedMustache();
