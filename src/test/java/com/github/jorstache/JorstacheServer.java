@@ -123,6 +123,11 @@ public class JorstacheServer {
     public JorstacheUser load(String id) {
       return new JorstacheUser(id);
     }
+
+    @Override
+    public JorstacheUser create(Request request) {
+      throw new AssertionError("Cannot create a new user like this");
+    }
   }
 
 }
