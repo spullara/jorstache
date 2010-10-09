@@ -57,10 +57,15 @@ public abstract class MustacheHandler implements Handler<Request> {
     mc.setSuperclass("com.github.jorstache.Jorstache");
     mustache = mc.parseFile(this.path);
     try {
-      clazz = RuntimeJavaCompiler.compile(new PrintWriter(System.out, true), classname, getText(codePath, new BufferedReader(new FileReader(code)))).loadClass(classname);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new MustacheException("Failed to read code: " + codePath, e);
+      clazz = Class.forName(classname);
+      code = null;
+    } catch (Exception ce) {
+      try {
+        clazz = RuntimeJavaCompiler.compile(new PrintWriter(System.out, true), classname, getText(codePath, new BufferedReader(new FileReader(code)))).loadClass(classname);
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new MustacheException("Failed to read code: " + codePath, e);
+      }
     }
   }
 
@@ -101,7 +106,7 @@ public abstract class MustacheHandler implements Handler<Request> {
 
   public Class<?> getCode() {
     if (code != null && System.currentTimeMillis() - lastcheck > 10000) {
-      if (code.lastModified() != codetimestamp) {
+      if (code.exists() && code.lastModified() != codetimestamp) {
         lastcheck = codetimestamp = code.lastModified();
         try {
           clazz = RuntimeJavaCompiler.compile(new PrintWriter(System.out, true), classname, getText(codePath, new BufferedReader(new FileReader(code)))).loadClass(classname);
