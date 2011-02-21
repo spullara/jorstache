@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Handle a mustache template request.
@@ -25,12 +27,13 @@ import java.io.PrintWriter;
  */
 public abstract class MustacheHandler implements Handler<Request> {
 
+  private Logger logger = Logger.getLogger("MustacheHandler");
   private MustacheCompiler mc;
   private Mustache mustache;
   private long timestamp;
-  private File template;
-  private File code;
-  private String path;
+  protected File template;
+  protected File code;
+  protected String path;
   private String codePath;
   private String classname;
   private long lastcheck = System.currentTimeMillis();
@@ -63,7 +66,6 @@ public abstract class MustacheHandler implements Handler<Request> {
       try {
         clazz = RuntimeJavaCompiler.compile(new PrintWriter(System.out, true), classname, getText(codePath, new BufferedReader(new FileReader(code)))).loadClass(classname);
       } catch (Exception e) {
-        e.printStackTrace();
         throw new MustacheException("Failed to read code: " + codePath, e);
       }
     }
@@ -93,7 +95,7 @@ public abstract class MustacheHandler implements Handler<Request> {
           mustache = mc.parseFile(path);
         } catch (MustacheException e) {
           // Log an error but continue running
-          e.printStackTrace();
+          logger.log(Level.SEVERE, "Failed to parse: " + path, e);
         }
       }
     }
@@ -111,7 +113,7 @@ public abstract class MustacheHandler implements Handler<Request> {
         try {
           clazz = RuntimeJavaCompiler.compile(new PrintWriter(System.out, true), classname, getText(codePath, new BufferedReader(new FileReader(code)))).loadClass(classname);
         } catch (Exception e) {
-          e.printStackTrace();
+          logger.log(Level.SEVERE, "Could not compile " + codePath, e);
         }
       }
     }

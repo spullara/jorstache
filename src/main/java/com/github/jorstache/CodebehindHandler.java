@@ -10,6 +10,8 @@ import jornado.Request;
 import jornado.Response;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
 * The code behind handler combines code (possibly dynamic) and a template.
@@ -21,6 +23,8 @@ import java.io.File;
 public class CodebehindHandler extends MustacheHandler {
   @Inject
   private Injector injector;
+
+  private Logger logger = Logger.getLogger("Codebehind");
 
   public CodebehindHandler(File root, String templatePath, String classname) throws MustacheException {
     this(root, templatePath, classname.replace(".", "/") + ".java", classname);
@@ -47,7 +51,7 @@ public class CodebehindHandler extends MustacheHandler {
       Object o = childInjector.getInstance(getCode());
       return super.handle(o);
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.log(Level.SEVERE, "Could not handle request: " + request + " in " + this, e);
       return new ErrorResponse(e.getMessage());
     }
   }

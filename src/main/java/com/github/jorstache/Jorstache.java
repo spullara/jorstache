@@ -52,12 +52,21 @@ public abstract class Jorstache extends Mustache {
         MustacheCompiler c = new MustacheCompiler(getRoot());
         c.setSuperclass(Jorstache.class.getName());
         if (name != null) {
+          Trace.Event event = null;
+          if (trace) {
+            Object parent = s.getParent();
+            String traceName = parent == null ? s.getClass().getName() : parent.getClass().getName();
+            event = Trace.addEvent("partial compile: " + name, traceName);
+          }
           Mustache mustache = c.parseFile(filename);
           tm = new TimestampedMustache();
           tm.mustache = mustache;
           tm.timestamp = new File(getRoot(), filename).lastModified();
           tm.lastcheck = System.currentTimeMillis();
           cache.put(filename, tm);
+          if (trace) {
+            event.end();
+          }
         } else {
           return;
         }
@@ -68,7 +77,16 @@ public abstract class Jorstache extends Mustache {
     Integer timeout = (Integer) scope.get("timeout");
     Long startTime = (Long) scope.get("jorstacheStartTime");
     if (timeout == null || startTime == null) {
+      Trace.Event event = null;
+      if (trace) {
+        Object parentObject = s.getParent();
+        String traceName = parentObject == null ? s.getClass().getName() : parentObject.getClass().getName();
+        event = Trace.addEvent("partial execute: " + name, traceName);
+      }
       tm.mustache.execute(writer, scope);
+      if (trace) {
+        event.end();
+      }
       return;
     }
     final long timeoutMillis = timeout - (System.currentTimeMillis() - startTime);
