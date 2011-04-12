@@ -12,12 +12,20 @@ import java.io.File;
 * To change this template use File | Settings | File Templates.
 */
 public class JorstacheCompiler extends MustacheCompiler {
+  private static boolean DEBUG = Boolean.getBoolean("jorstache.debug");
+
   public JorstacheCompiler(File root) {
     super(root);
   }
 
   @Override
+  protected void append(StringBuilder template, char c, boolean onlywhitespace) {
+    if (DEBUG && onlywhitespace) return;
+    super.append(template, c, onlywhitespace);
+  }
+
+  @Override
   protected void writeText(StringBuilder sb, String text) {
-    super.writeText(sb, text.replaceAll("\\s+", " "));
+    super.writeText(sb, DEBUG ? text : text.replaceAll("\\s+", " "));
   }
 }
