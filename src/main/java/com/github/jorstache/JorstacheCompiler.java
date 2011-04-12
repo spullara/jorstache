@@ -20,7 +20,7 @@ public class JorstacheCompiler extends MustacheCompiler {
 
   @Override
   protected void append(StringBuilder template, char c, boolean onlywhitespace) {
-    if (DEBUG && onlywhitespace) return;
+    if (onlywhitespace && !DEBUG) return;
     super.append(template, c, onlywhitespace);
   }
 
