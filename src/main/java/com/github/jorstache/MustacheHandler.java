@@ -44,7 +44,7 @@ public abstract class MustacheHandler implements Handler<Request> {
     this.path = path;
     template = new File(root, path);
     timestamp = template.lastModified();
-    mc = new MustacheCompiler(root);
+    mc = new JorstacheCompiler(root);
     mustache = mc.parseFile(this.path);
   }
 
@@ -56,7 +56,7 @@ public abstract class MustacheHandler implements Handler<Request> {
     code = new File(root, codePath);
     timestamp = template.lastModified();
     codetimestamp = code.lastModified();
-    mc = new MustacheCompiler(root);
+    mc = new JorstacheCompiler(root);
     mc.setSuperclass("com.github.jorstache.Jorstache");
     mustache = mc.parseFile(this.path);
     try {
@@ -119,4 +119,5 @@ public abstract class MustacheHandler implements Handler<Request> {
     }
     return clazz;
   }
+
 }

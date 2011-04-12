@@ -49,7 +49,7 @@ public abstract class Jorstache extends Mustache {
       if (tm == null || ((System.currentTimeMillis() - tm.lastcheck > 10000) &&
               ((tm.lastcheck = System.currentTimeMillis()) > 0) &&
               (new File(getRoot(), filename).lastModified() > tm.timestamp))) {
-        MustacheCompiler c = new MustacheCompiler(getRoot());
+        MustacheCompiler c = new JorstacheCompiler(getRoot());
         c.setSuperclass(Jorstache.class.getName());
         if (name != null) {
           Trace.Event event = null;
