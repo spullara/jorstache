@@ -19,12 +19,6 @@ public class JorstacheCompiler extends MustacheCompiler {
   }
 
   @Override
-  protected void append(StringBuilder template, char c, boolean onlywhitespace) {
-    if (onlywhitespace && !DEBUG) return;
-    super.append(template, c, onlywhitespace);
-  }
-
-  @Override
   protected void writeText(StringBuilder sb, String text) {
     super.writeText(sb, DEBUG ? text : text.replaceAll("\\s+", " "));
   }
