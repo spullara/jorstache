@@ -18,6 +18,6 @@ public class JorstacheCompiler extends MustacheCompiler {
 
   @Override
   protected void writeText(StringBuilder sb, String text) {
-    super.writeText(sb, text.replaceAll("\\s+", " ").replaceAll("^ ", ""));
+    super.writeText(sb, text.replaceAll("\\s+", " "));
   }
 }
