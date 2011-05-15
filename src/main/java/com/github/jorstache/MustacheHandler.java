@@ -1,7 +1,6 @@
 package com.github.jorstache;
 
 import com.sampullara.mustache.Mustache;
-import com.sampullara.mustache.MustacheCompiler;
 import com.sampullara.mustache.MustacheException;
 import com.sampullara.mustache.Scope;
 import com.sampullara.util.RuntimeJavaCompiler;
@@ -28,7 +27,7 @@ import java.util.logging.Logger;
 public abstract class MustacheHandler implements Handler<Request> {
 
   private Logger logger = Logger.getLogger("MustacheHandler");
-  private MustacheCompiler mc;
+  private JorstacheCompiler mc;
   private Mustache mustache;
   private long timestamp;
   protected File template;
@@ -57,7 +56,6 @@ public abstract class MustacheHandler implements Handler<Request> {
     timestamp = template.lastModified();
     codetimestamp = code.lastModified();
     mc = new JorstacheCompiler(root);
-    mc.setSuperclass("com.github.jorstache.Jorstache");
     mustache = mc.parseFile(this.path);
     try {
       clazz = Class.forName(classname);

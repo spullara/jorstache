@@ -1,6 +1,6 @@
 package com.github.jorstache;
 
-import com.sampullara.mustache.MustacheCompiler;
+import com.sampullara.mustache.MustacheBuilder;
 
 import java.io.File;
 
@@ -11,15 +11,11 @@ import java.io.File;
 * Time: 5:46 PM
 * To change this template use File | Settings | File Templates.
 */
-public class JorstacheCompiler extends MustacheCompiler {
+public class JorstacheCompiler extends MustacheBuilder {
   private static boolean DEBUG = Boolean.getBoolean("jorstache.debug");
 
   public JorstacheCompiler(File root) {
     super(root);
   }
 
-  @Override
-  protected void writeText(StringBuilder sb, String text) {
-    super.writeText(sb, DEBUG ? text : text.replaceAll("\\s+", " "));
-  }
 }

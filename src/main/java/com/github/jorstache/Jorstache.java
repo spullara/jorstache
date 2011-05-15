@@ -1,8 +1,9 @@
 package com.github.jorstache;
 
 import com.sampullara.mustache.Mustache;
-import com.sampullara.mustache.MustacheCompiler;
+import com.sampullara.mustache.MustacheBuilder;
 import com.sampullara.mustache.MustacheException;
+import com.sampullara.mustache.MustacheTrace;
 import com.sampullara.mustache.Scope;
 import com.sampullara.util.FutureWriter;
 
@@ -27,6 +28,9 @@ import java.util.concurrent.TimeoutException;
  */
 public abstract class Jorstache extends Mustache {
 
+  public Jorstache() {
+  }
+
   // TODO: Guice up mustache.java
   private static ExecutorService es = Executors.newCachedThreadPool();
 
@@ -39,7 +43,7 @@ public abstract class Jorstache extends Mustache {
   private static Map<String, TimestampedMustache> cache = new ConcurrentHashMap<String, TimestampedMustache>();
 
   @Override
-  protected void partial(final FutureWriter writer, Scope s, String name) throws MustacheException {
+  protected Mustache partial(String name) throws MustacheException {
     String parentDir = new File(getPath()).getParent();
     String filename = (parentDir == null ? "" : parentDir + "/") + name + ".html";
     TimestampedMustache tm;
@@ -49,53 +53,47 @@ public abstract class Jorstache extends Mustache {
       if (tm == null || ((System.currentTimeMillis() - tm.lastcheck > 10000) &&
               ((tm.lastcheck = System.currentTimeMillis()) > 0) &&
               (new File(getRoot(), filename).lastModified() > tm.timestamp))) {
-        MustacheCompiler c = new JorstacheCompiler(getRoot());
-        c.setSuperclass(Jorstache.class.getName());
+        MustacheBuilder c = new JorstacheCompiler(getRoot());
         if (name != null) {
-          Trace.Event event = null;
-          if (trace) {
-            Object parent = s.getParent();
-            String traceName = parent == null ? s.getClass().getName() : parent.getClass().getName();
-            event = Trace.addEvent("partial compile: " + name, traceName);
-          }
-          Mustache mustache = c.parseFile(filename);
+          Mustache mustache = super.partial(name);
           tm = new TimestampedMustache();
           tm.mustache = mustache;
           tm.timestamp = new File(getRoot(), filename).lastModified();
           tm.lastcheck = System.currentTimeMillis();
           cache.put(filename, tm);
-          if (trace) {
-            event.end();
-          }
         } else {
-          return;
+          return null;
         }
       }
     }
+    return tm.mustache;
+  }
+
+  @Override
+  protected void partial(final FutureWriter writer, Scope s, String name, final Mustache partial) throws MustacheException {
     Object parent = s.get(name);
     final Scope scope = parent == null ? s : new Scope(parent, s);
     Integer timeout = (Integer) scope.get("timeout");
     Long startTime = (Long) scope.get("jorstacheStartTime");
     if (timeout == null || startTime == null) {
-      Trace.Event event = null;
+      MustacheTrace.Event event = null;
       if (trace) {
         Object parentObject = s.getParent();
         String traceName = parentObject == null ? s.getClass().getName() : parentObject.getClass().getName();
-        event = Trace.addEvent("partial execute: " + name, traceName);
+        event = MustacheTrace.addEvent("partial execute: " + name, traceName);
       }
-      tm.mustache.execute(writer, scope);
+      partial.execute(writer, scope);
       if (trace) {
         event.end();
       }
       return;
     }
     final long timeoutMillis = timeout - (System.currentTimeMillis() - startTime);
-    final TimestampedMustache finalTm = tm;
     final Future<Object> future = es.submit(new Callable<Object>() {
       @Override
       public Object call() throws Exception {
         FutureWriter fw = new FutureWriter();
-        finalTm.mustache.execute(fw, scope);
+        partial.execute(fw, scope);
         return fw;
       }
     });
