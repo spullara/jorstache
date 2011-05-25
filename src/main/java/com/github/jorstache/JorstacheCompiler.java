@@ -16,6 +16,7 @@ public class JorstacheCompiler extends MustacheBuilder {
 
   public JorstacheCompiler(File root) {
     super(root);
+    setSuperclass("com.github.jorstache.Jorstache");
   }
 
 }

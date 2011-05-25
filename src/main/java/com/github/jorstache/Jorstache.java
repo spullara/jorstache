@@ -26,7 +26,7 @@ import java.util.concurrent.TimeoutException;
  * Date: May 27, 2010
  * Time: 5:10:24 PM
  */
-public abstract class Jorstache extends Mustache {
+public class Jorstache extends Mustache {
 
   public Jorstache() {
   }
@@ -50,16 +50,17 @@ public abstract class Jorstache extends Mustache {
     // We were compiling too many times here when concurrent
     synchronized (filename.intern()) {
       tm = cache.get(filename);
-      if (tm == null || ((System.currentTimeMillis() - tm.lastcheck > 10000) &&
-              ((tm.lastcheck = System.currentTimeMillis()) > 0) &&
+      long now = System.currentTimeMillis();
+      if (tm == null || ((now - tm.lastcheck > 10000) &&
+              ((tm.lastcheck = now) > 0) &&
               (new File(getRoot(), filename).lastModified() > tm.timestamp))) {
-        MustacheBuilder c = new JorstacheCompiler(getRoot());
         if (name != null) {
           Mustache mustache = super.partial(name);
+          mustache.setRoot(getRoot());
           tm = new TimestampedMustache();
           tm.mustache = mustache;
-          tm.timestamp = new File(getRoot(), filename).lastModified();
-          tm.lastcheck = System.currentTimeMillis();
+          tm.timestamp = new File(getRoot(), getPath()).lastModified();
+          tm.lastcheck = now;
           cache.put(filename, tm);
         } else {
           return null;
