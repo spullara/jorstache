@@ -55,7 +55,7 @@ public class Jorstache extends Mustache {
               ((tm.lastcheck = now) > 0) &&
               (new File(getRoot(), filename).lastModified() > tm.timestamp))) {
         if (name != null) {
-          Mustache mustache = super.partial(name);
+          Mustache mustache = super.compilePartial(name);
           mustache.setRoot(getRoot());
           tm = new TimestampedMustache();
           tm.mustache = mustache;
