@@ -6,9 +6,11 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.sampullara.mustache.MustacheException;
 import jornado.ErrorResponse;
+import jornado.HeaderOp;
 import jornado.Request;
 import jornado.Response;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,7 +51,14 @@ public class CodebehindHandler extends MustacheHandler {
         }
       });
       Object o = childInjector.getInstance(getCode());
-      return super.handle(o);
+      final Response handle = super.handle(o);
+      handle.addHeaderOp(new HeaderOp() {
+        public void execute(HttpServletResponse response) {
+          response.addHeader("Cache-Control", "private, no-cache, no-store, must-revalidate, max-age=0");
+          response.addHeader("Pragma", "no-cache");
+        }
+      });
+      return handle;
     } catch (Exception e) {
       logger.log(Level.SEVERE, "Could not handle request: " + request + " in " + this, e);
       return new ErrorResponse(e.getMessage());
