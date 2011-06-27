@@ -22,6 +22,7 @@ public class MustacheResponse implements Response {
   public static final Iterable<HeaderOp> EMPTY_ITERABLE = new ArrayList<HeaderOp>(0);
   private List<HeaderOp> headerList = new ArrayList<HeaderOp>();
   private MustacheBody mustacheBody;
+  private Status status = Status.OK;
 
   public MustacheResponse(Mustache mustache, Scope scope) throws MustacheException {
     scope.put("jorstacheStartTime", System.currentTimeMillis());
@@ -35,7 +36,7 @@ public class MustacheResponse implements Response {
 
   @Override
   public Status getStatus() {
-    return Status.OK;
+    return status;
   }
 
   @Override
@@ -48,4 +49,7 @@ public class MustacheResponse implements Response {
     headerList.add(headerOp);
   }
 
+  public void setStatus(Status status) {
+    this.status = status;
+  }
 }
